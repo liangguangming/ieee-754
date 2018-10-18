@@ -1,0 +1,7 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "charset": "utf8",
+        "alwaysStrict": true
+    }
+}
