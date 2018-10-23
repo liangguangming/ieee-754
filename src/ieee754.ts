@@ -211,17 +211,14 @@ export class IEEE754 {
         // 判断指数位数
         S = nums[0];
         let e = this.getDigit(nums[1]);
-        if (e>0) {
+        if (e === 0 && Number(nums[1]) === 0) {
+            let dec = nums[2];
+            e = 0-(dec.indexOf('1')+1);
             E = this.convertTenToTwo((Math.pow(2, floatConfig.eBit-1) - 1 + e).toString(),floatConfig)[1];
-            // E的位数不够前面补零
+            M = dec.substr(dec.indexOf('1')+1, floatConfig.mBit)
+        } else {
+            E = this.convertTenToTwo((Math.pow(2, floatConfig.eBit-1) - 1 + e).toString(),floatConfig)[1];
             M = (nums[1].substr(1) + nums[2]).substring(0,floatConfig.mBit);
-        } else if(e === 0) {
-            if (Number(nums[1]) === 0) {
-                let dec = nums[2];
-                e = 0-(dec.indexOf('1')+1);
-                E = this.convertTenToTwo((Math.pow(2, floatConfig.eBit-1) - 1 + e).toString(),floatConfig)[1];
-                M = dec.substr(dec.indexOf('1')+1, floatConfig.mBit)
-            }
         }
         let eLen = E.length;
         for (let i = 0;i<floatConfig.eBit - eLen;i++) {
@@ -241,8 +238,10 @@ export class IEEE754 {
     // 二进制转16进制
     private static binToHex(num: string) {
         let len = num.length;
-        for(let i = 0;i<len%4;i++) {
-            num = '0' + num;
+        if (len%4 !== 0) {
+            for(let i = 0;i<len%4;i++) {
+                num = '0' + num;
+            }
         }
         let result = '';
         for (let j=0;j<num.length;j+=4 ) {
@@ -379,4 +378,5 @@ export class IEEE754 {
         }
         return true;
     }
+
 }
