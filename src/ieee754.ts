@@ -315,6 +315,8 @@ export class IEEE754 {
                 for (let i = 0;i<Math.abs(e) - 1; i++) {
                     num = '0' + num;
                 }
+            } else if(Number(e)>0 && e<num.length - 1) {
+                num = num.substring(0,e+1) + '.' + num.substring(e+1);
             } else {
                 let len = num.length;
                 for (let i = 0;i<Math.abs(e) - len + 1; i++) {
@@ -379,4 +381,10 @@ export class IEEE754 {
         return true;
     }
 
+    public static test() {
+        console.log(this.scienceToNum("1.111111111111115e3"));
+    }
+
 }
+
+IEEE754.test();
