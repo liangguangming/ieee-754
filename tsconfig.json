@@ -1,6 +1,9 @@
 {
     "compilerOptions": {
-        "target": "es6",
+        "target": "es2015",
+        "module": "CommonJS",
+        "outDir": "dist",
+        "declaration": true,
         "charset": "utf8",
         "alwaysStrict": true
     }

@@ -20,12 +20,12 @@ export class IEEE754 {
 
     static regexc =/^(\d+)\.(\d+)/;
 
-    public static singleFloatToHex(num: string) {
-        return this.convertIEEE(num, new SingleFloatConfig());
+    public static singleFloatToHex(num: number) {
+        return this.convertIEEE(String(num), new SingleFloatConfig());
     }
 
-    public static doubleFloatToHex(num: string) {
-        return this.convertIEEE(num, new DoubleFloatConfig());
+    public static doubleFloatToHex(num: number) {
+        return this.convertIEEE(String(num), new DoubleFloatConfig());
     }
 
     public static hexToSingleFloat(num: string) {
@@ -380,11 +380,65 @@ export class IEEE754 {
         }
         return true;
     }
-
-    public static test() {
-        console.log(this.scienceToNum("1.111111111111115e3"));
-    }
-
 }
 
-IEEE754.test();
+export class IEEE754_NEW {
+    public static singleFloatToHex(num: number): string {
+        return this.floatToHex(num, Float32Array);
+    }
+
+    public static doubleFloatToHex(num: number) {
+        return this.floatToHex(num, Float64Array);
+    }
+
+    public static hexToSingleFloat(hex: string) {
+        return this.hexToFloat(hex, Float32Array);
+    }
+
+    public static hexToDoubleFloat(hex: string) {
+        return this.hexToFloat(hex, Float64Array);
+    }
+
+    private static checkoutHex(hex: string) {
+        if (hex.indexOf('0x') === 0 || hex.indexOf('0X') === 0) {
+            return hex.substring(2);
+        }
+
+        throw new Error("hex 必须是 0x 或 0X 开头");
+    }
+
+    private static hexToFloat(hex: string, Type: Float32ArrayConstructor | Float64ArrayConstructor) {
+        hex = this.checkoutHex(hex);
+        const numberArray = [];
+        const length = Type.name === "Float32Array" ? 32 / 8 : 64 / 8;
+        for (let i = length - 1; i > -1; i--) {
+            let unit = hex.substring(i * 2, i * 2 + 2);
+            numberArray.push(Number(`0x${unit}`));
+        }
+        const uint8Array = new Uint8Array(numberArray);
+        const floatArray = new Type(uint8Array.buffer);
+
+        return floatArray[0];
+    }
+
+    private static floatToHex(num: number, Type: Float32ArrayConstructor | Float64ArrayConstructor) {
+        let result = "0x";
+        const floatArray = new Type([num]);
+        const uint8Array = new Uint8Array(floatArray.buffer);
+        const length = floatArray instanceof Float32Array ? 32 / 8 : 64 / 8;
+        for (let i = length - 1; i > -1; i--) {
+            const byte = uint8Array[i];
+            const first = byte >> 4;
+            const second = byte - first * 16;
+            result += first.toString(16);
+            result += second.toString(16);
+        }
+
+        return result;
+    }
+}
+
+console.log(IEEE754.doubleFloatToHex(15.32));
+console.log(IEEE754.hexToDoubleFloat("0x402ea3d70a3d70a4"));
+console.log(IEEE754_NEW.doubleFloatToHex(15.32));
+console.log(IEEE754_NEW.hexToDoubleFloat("0x402ea3d70a3d70a4"));
